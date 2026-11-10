@@ -1,0 +1,181 @@
+/* ========================================
+   11. ジャケットの曲名表示（PC・スマホ共通）
+======================================== */
+
+/* ジャケットと曲名の表示領域 */
+.jacket-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  /* スマホのタッチ操作対策 */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ジャケット画像 */
+.jacket-wrapper .bingo-jacket {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 曲名を重ねる半透明の背景 */
+.jacket-title {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 5px;
+  box-sizing: border-box;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+
+  /* 通常時は非表示 */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  /* マウス・タッチ操作を妨げない */
+  pointer-events: none;
+}
+
+/* ========================================
+   PC：マウスホバーで曲名表示
+======================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .jacket-wrapper:hover .jacket-title {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   スマホ：長押しで曲名表示
+======================================== */
+
+.jacket-wrapper.long-press .jacket-title {
+  opacity: 1;
+}
+
+/* ========================================
+   ビンゴサイズ別の文字サイズ
+======================================== */
+
+/* 3×3 */
+.bingo-3x3 .jacket-title {
+  font-size: 18px;
+}
+
+/* 5×5 */
+.bingo-5x5 .jacket-title {
+  font-size: 13px;
+}
+
+/* 7×7 */
+.bingo-7x7 .jacket-title {
+  font-size: 10px;
+  padding: 3px;
+}
+
+/* ========================================
+   スマートフォン向け文字サイズ
+======================================== */
+
+@media (max-width: 600px) {
+  .bingo-3x3 .jacket-title {
+    font-size: 14px;
+  }
+
+  .bingo-5x5 .jacket-title {
+    font-size: 10px;
+  }
+
+  .bingo-7x7 .jacket-title {
+    font-size: 8px;
+    padding: 2px;
+    line-height: 1.1;
+  }
+}
+
+/* ========================================
+   PNG保存時は曲名を非表示
+======================================== */
+
+.bingo-exporting .jacket-title {
+  opacity: 0 !important;
+}
+
+
+/* ========================================
+   13. ビンゴチェックと保存済みカード一覧
+======================================== */
+
+.bingo-table td.bingo-check-cell { 
+  position: relative; cursor: pointer; 
+}
+
+.bingo-table td.bingo-check-cell:focus-visible { 
+  outline: 3px solid #1877d2; outline-offset: -3px; 
+}
+
+.bingo-check-mark {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(22, 120, 70, .28);
+  color: white; font-weight: 900; font-size: clamp(25px, 7vw, 76px);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+  opacity: 0; pointer-events: none;
+}
+
+.bingo-checked > .bingo-check-mark { 
+  opacity: 1; 
+}
+
+.bingo-3x3 .bingo-check-mark { 
+  font-size: clamp(45px, 10vw, 90px); 
+}
+
+.bingo-5x5 .bingo-check-mark { 
+  font-size: clamp(30px, 7vw, 65px); 
+}
+
+.bingo-7x7 .bingo-check-mark { 
+  font-size: clamp(20px, 5vw, 45px); 
+}
+
+
+/* チェックマークを曲名表示より前面に表示 */
+
+/* ジャケット・曲名表示 */
+.bingo-table .jacket-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* PCホバー・スマホ長押し時も重なり順を維持 */
+.bingo-table .jacket-wrapper:hover,
+.bingo-table .jacket-wrapper.long-press {
+  z-index: 1;
+}
+
+/* 曲名表示 */
+.bingo-table .jacket-title {
+  z-index: 1;
+}
+
+/* チェックマークを最前面に */
+.bingo-table .bingo-check-mark {
+  z-index: 5;
+}
+

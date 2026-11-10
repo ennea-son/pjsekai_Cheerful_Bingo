@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>【プロセカ】チアフルビンゴ作成ツール</title>
+  <!-- <script type="module" src="filter.js"></script> -->
+  <script type="module" src="./js/app.js"></script>
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/selection.css">
+  <link rel="stylesheet" href="./css/bingo.css">
+  <link rel="stylesheet" href="./css/bingoCheck.css">
+</head>
+
+<body>
+  <div id="main">
+    <h1 class="title">プロセカビンゴ作成ツール</h1>
+    <div>
+      プロセカのチアフルイベントやおまかせ周回などで使用できるビンゴを作成できるサイトです。
+    </div>
+
+    <!-- STEP 1：ビンゴサイズ選択 -->
+    <div id="step1">
+      <h1>ビンゴカードの大きさを選択</h1>
+      <div id="bingoSizeSelector">
+        <button data-size="3">3×3</button>
+        <button data-size="5">5×5</button>
+        <button data-size="7">7×7</button>
+      </div>
+    </div>
+
+    <!-- 
+    <p id="requiredCountText">ビンゴサイズを選択してください。</p> 
+    -->
+
+    <!-- STEP 2：曲の選び方を選択 -->
+    <div id="songModeStep" style="display:none;">
+      <h1>曲の選び方を選択</h1>
+      <div id="songModeSelector">
+        <button data-mode="manual">自分で選ぶ</button>
+        <button data-mode="random">全ランダム</button>
+      </div>
+    </div>
+
+    <!-- STEP 3：中央マス選択（自分で選ぶ場合のみ） -->
+    <div id="step2">
+      <div>
+        <h1>中央のマスのタイプを選択</h1>
+        <div id="centerOptionSelector">
+          <button class="center-btn" data-option="FREE">FREE</button>
+          <button class="center-btn" data-option="任意の曲">任意の曲</button>
+          <button class="center-btn" data-option="ランダム">ランダム</button>
+        </div>
+        <!-- 
+      <select id="centerSongSelect" style="display:none;">
+        <option value="">曲を選択してください</option>
+      </select>
+      -->
+      </div>
+    </div>
+
+    <!-- STEP 4：中央の曲選択（任意の曲を選んだ場合のみ） -->
+    <div id="centerSongSelector" style="display:none; margin-top: 12px;">
+      <h1>中央の曲を選択</h1>
+
+      <input type="text" id="centerSearchInput" placeholder="曲名で検索">
+      <select id="centerUnitSelect">
+        <option value="">すべてのユニット</option>
+      </select>
+
+      <select id="centerMvTypeSelect">
+        <option value="">すべてのMVタイプ</option>
+      </select>
+
+      <select id="centerSongTypeSelect">
+        <option value="">すべての曲種別</option>
+      </select>
+
+      <div id="centerSongListContainer">
+        <table id="centerSongList">
+          <thead>
+            <tr>
+              <th>選択</th>
+              <th>曲名</th>
+              <th>ユニット</th>
+            </tr>
+          </thead>
+          <tbody id="centerSongListBody"></tbody>
+        </table>
+      </div>
+
+      <p id="centerSelectedDisplay"></p>
+    </div>
+
+
+    <!-- STEP 5：ビンゴカード用の曲選択 -->
+    <div id="songSelectStep">
+      <h1>ビンゴカード用の曲を選択</h1>
+
+      <div>
+        <input type="text" id="searchInput" placeholder="曲名で検索">
+        <select id="unitSelect">
+          <option value="">すべてのユニット</option>
+        </select>
+
+        <select id="mvTypeSelect">
+          <option value="">すべてのMVタイプ</option>
+        </select>
+
+        <select id="songTypeSelect">
+          <option value="">すべての曲種別</option>
+        </select>
+      </div>
+
+      <div id="songListContainer">
+        <table id="songList">
+          <thead>
+            <tr>
+              <th>
+                <div class="header-title">選択</div>
+                <div class="header-controls">
+                  <label>
+                    <input type="checkbox" id="selectAllSongs">
+                    全選択
+                  </label>
+                  <label>
+                    <input type="checkbox" id="deselectAllSongs">
+                    全解除
+                  </label>
+                </div>
+              </th>
+
+              <th>
+                <div class="header-title">曲名</div>
+                <div class="header-controls-empty"></div>
+              </th>
+
+              <th>
+                <div class="header-title">ユニット</div>
+                <div class="header-controls-empty"></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="songListBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 選択曲リスト表示 -->
+      <h1>選択した曲（<span id="selectedCount">0</span> 曲）</h1>
+
+      <details class="selected-songs-details">
+        <summary class="selected-songs-summary">
+          <span>選択した曲の一覧を表示</span>
+        </summary>
+
+        <div class="selected-songs-scroll">
+          <ul id="selectedSongs"></ul>
+        </div>
+      </details>
+
+      <!-- ビンゴ表示 -->
+      <button id="generateBingoBtn" disabled>ビンゴを生成</button>
+
+    </div>
+
+    <!-- 全ランダム用の生成ボタン -->
+    <div id="randomGenerateStep">
+      <button id="randomGenerateBtn" disabled>全ランダムで生成</button>
+    </div>
+
+    <div id="bingoContainer">
+    </div>
+
+    <!-- ビンゴ画像保存ボタン -->
+    <div id="saveBingoArea" style="display: none;">
+      <button id="saveBingoBtn" type="button">
+        ビンゴ画像を保存
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+
+</html>

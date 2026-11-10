@@ -1,0 +1,267 @@
+/* ========================================
+   8. ビンゴ生成ボタン
+======================================== */
+
+#generateBingoBtn,
+#randomGenerateBtn {
+  font-size: 1.6rem;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px 40px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+
+/* ========================================
+   9. ビンゴカード表示
+======================================== */
+
+#bingoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.bingo-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.bingo-table {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.bingo-table td {
+  padding: 0;
+  border: 1px solid #555;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #fafafa;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.bingo-table td.text-padding {
+  padding: 10px;
+}
+
+/* サイズ別 */
+.bingo-3x3 td {
+  width: calc(100% / 3);
+  height: calc(100% / 3);
+}
+
+.bingo-5x5 td {
+  width: calc(100% / 5);
+  height: calc(100% / 5);
+}
+
+.bingo-7x7 td {
+  width: calc(100% / 7);
+  height: calc(100% / 7);
+}
+
+/* ジャケット画像 */
+.bingo-jacket {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border: none;
+}
+
+
+/* ========================================
+   10. FREEマスのデザイン
+======================================== */
+
+/* FREEマス */
+.bingo-table td.free-cell {
+  position: relative;
+  padding: 0;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* FREE画像 */
+.free-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* FREEマスではチェックマークを非表示 */
+.bingo-table td.free-cell .bingo-check-mark {
+  display: none;
+}
+
+
+/* ========================================
+   12. ビンゴ画像保存ボタン
+======================================== */
+
+#saveBingoArea {
+  text-align: center;
+  margin: 20px auto 40px;
+}
+
+#saveBingoBtn {
+  font-size: 1.3rem;
+  padding: 12px 30px;
+  border: 1px solid #888;
+  border-radius: 8px;
+  background-color: #f7f7f7;
+  cursor: pointer;
+}
+
+#saveBingoBtn:hover {
+  background-color: #e0e0e0;
+}
+
+#saveBingoBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#savedBingoSection { 
+  max-width: 700px; margin: 24px auto; padding: 12px; box-sizing: border-box; 
+}
+#savedBingoSection h3 { 
+  margin: 0 0 8px; 
+}
+
+.saved-bingo-note { 
+  font-size: 13px; color: #555; 
+}
+
+.saved-bingo-row { 
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 9px 4px; border-bottom: 1px solid #ddd; 
+}
+
+.saved-bingo-row.is-active { 
+  background: #e7f5e9; 
+}
+
+.saved-bingo-title { 
+  flex: 1 1 220px; font-size: 13px; 
+}
+
+.saved-bingo-row button { 
+  padding: 6px 10px; cursor: pointer; 
+}
+
+.saved-bingo-row button:disabled { 
+  cursor: default; 
+}
+
+
+/* ========================================
+   保存済みビンゴ一覧
+   最大10件・内部スクロール
+======================================== */
+
+/* 保存済みビンゴ一覧 */
+#savedBingoList {
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* 保存件数 */
+.saved-bingo-count {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* 10件に達した場合 */
+.saved-bingo-count.is-full {
+  color: #a33;
+  font-weight: bold;
+}
+
+/* スマートフォン */
+@media (max-width: 600px) {
+  #savedBingoList {
+    max-height: 240px;
+  }
+}
+
+
+/* ========================================
+   保存履歴の一括削除ボタン
+======================================== */
+
+/* 保存件数と一括削除ボタン */
+.saved-bingo-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+/* 保存件数 */
+.saved-bingo-toolbar .saved-bingo-count {
+  margin: 0;
+}
+
+/* 一括削除ボタン */
+#deleteAllBingosBtn {
+  padding: 9px 14px;
+  border: 1px solid #d9534f;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #c9302c;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#deleteAllBingosBtn:hover:not(:disabled) {
+  background-color: #fff0f0;
+}
+
+/* 保存履歴が0件の場合 */
+#deleteAllBingosBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* スマートフォン */
+@media (max-width: 600px) {
+  .saved-bingo-toolbar {
+    flex-wrap: wrap;
+  }
+
+  #deleteAllBingosBtn {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}

@@ -1,0 +1,300 @@
+/* ========================================
+   3. 曲選択リスト共通
+======================================== */
+
+/* 2つのリストの表示領域を統一 */
+#centerSongListContainer,
+#songListContainer {
+  width: 100%;
+  max-width: 800px;
+  max-height: 400px;
+  margin: 0 auto;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* 通常曲リストは初期状態で無効 */
+#songListContainer {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* テーブル共通 */
+#centerSongList,
+#songList {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* セル共通 */
+#centerSongList th,
+#centerSongList td,
+#songList th,
+#songList td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* 列幅の統一 */
+
+/* 1列目：選択 */
+#centerSongList th:nth-child(1),
+#centerSongList td:nth-child(1),
+#songList th:nth-child(1),
+#songList td:nth-child(1) {
+  width: 70px;
+}
+
+/* 2列目：曲名 */
+#centerSongList th:nth-child(2),
+#centerSongList td:nth-child(2),
+#songList th:nth-child(2),
+#songList td:nth-child(2) {
+  width: 55%;
+}
+
+/* 3列目：ユニット */
+#centerSongList th:nth-child(3),
+#centerSongList td:nth-child(3),
+#songList th:nth-child(3),
+#songList td:nth-child(3) {
+  width: auto;
+}
+
+/* 行の操作 */
+#centerSongList tbody tr,
+#songList tbody tr {
+  cursor: pointer;
+}
+
+#centerSongList tbody tr:hover,
+#songList tbody tr:hover {
+  background-color: rgba(200, 200, 200, 0.3);
+}
+
+/* 選択済みの行 */
+#centerSongList tbody tr.selected-row,
+#songList tbody tr.selected-row {
+  background-color: #d0f0c0;
+}
+
+#centerSongList tbody tr.selected-row:hover,
+#songList tbody tr.selected-row:hover {
+  background-color: rgba(174, 202, 160, 0.7);
+}
+
+
+/* ========================================
+   4. 中央曲選択リスト
+======================================== */
+
+#centerSongList thead th {
+  position: sticky;
+  top: 0;
+  background-color: #fdd6d6;
+  border-bottom: 1px solid #ccc;
+  z-index: 2;
+}
+
+
+/* ========================================
+   5. 通常曲選択リスト
+======================================== */
+
+/* ヘッダー全体 */
+#songList thead th {
+  position: sticky;
+  top: 0;
+  padding: 0;
+  background-color: #d6fdfa;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+  vertical-align: top;
+  z-index: 2;
+}
+
+/* 全選択・全解除を隣の列より前面に表示 */
+#songList thead th:first-child {
+  z-index: 4;
+}
+
+/* 擬似2段ヘッダー：1段目 */
+#songList .header-title {
+  height: 40px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #aaa;
+  box-sizing: border-box;
+}
+
+/* 擬似2段ヘッダー：2段目 */
+#songList .header-controls,
+#songList .header-controls-empty {
+  height: 34px;
+  box-sizing: border-box;
+}
+
+/* 全選択・全解除 */
+#songList .header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+#songList .header-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+/* 全選択・全解除のチェックボックス */
+#songList .header-controls input[type="checkbox"] {
+  transform: scale(1.5);
+  margin: 0 10px 0 0;
+}
+
+
+/* ========================================
+   6. チェックボックス共通
+======================================== */
+
+input[type="checkbox"] {
+  transform: scale(1.5);
+  margin: 0 10px 0 0;
+  cursor: pointer;
+}
+
+
+
+/* ========================================
+   7. 選択した曲の一覧（折りたたみ＋スクロール）
+======================================== */
+
+/* 一覧全体 */
+.selected-songs-details {
+  width: 90%;
+  max-width: 900px;
+  margin: 15px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+/* 開閉ボタン */
+.selected-songs-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 18px;
+
+  background-color: #f5f5f5;
+  font-size: 15px;
+  font-weight: bold;
+
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+/* 標準の三角マークを非表示 */
+.selected-songs-summary::-webkit-details-marker {
+  display: none;
+}
+
+/* 開閉アイコン */
+.selected-songs-summary::after {
+  content: "▼";
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+/* 展開時はアイコンを反転 */
+.selected-songs-details[open] .selected-songs-summary::after {
+  transform: rotate(180deg);
+}
+
+/* ホバー時 */
+.selected-songs-summary:hover {
+  background-color: #eaeaea;
+}
+
+/* 展開した一覧のスクロール領域 */
+.selected-songs-scroll {
+  max-height: 250px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  padding: 12px;
+  border-top: 1px solid #ddd;
+}
+
+/* 曲一覧 */
+#selectedSongs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  column-gap: 12px;
+  row-gap: 10px;
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 曲名 */
+#selectedSongs li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   スマートフォン向け
+======================================== */
+
+@media (max-width: 600px) {
+  .selected-songs-details {
+    width: 95%;
+  }
+
+  .selected-songs-summary {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .selected-songs-scroll {
+    max-height: 200px;
+    padding: 10px;
+  }
+
+  /* スマホでは2列表示 */
+  #selectedSongs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 8px;
+  }
+
+  #selectedSongs li {
+    font-size: 12px;
+  }
+}
+
+

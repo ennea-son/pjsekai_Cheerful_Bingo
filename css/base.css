@@ -1,0 +1,76 @@
+/* ========================================
+   1. 共通設定・画面遷移
+======================================== */
+
+#main {
+  text-align: center;
+}
+
+/* 初期状態では後続ステップを非表示 */
+#songModeStep,
+#step2,
+#centerSongSelector,
+#songSelectStep,
+#randomGenerateStep {
+  display: none;
+}
+
+/* スクロール位置 */
+#step1,
+#songModeStep,
+#step2,
+#centerSongSelector,
+#songSelectStep,
+#randomGenerateStep {
+  scroll-margin-top: 20px;
+}
+
+
+/* ========================================
+   2. 選択ボタン共通
+======================================== */
+
+#bingoSizeSelector,
+#songModeSelector,
+#centerOptionSelector {
+  margin-bottom: 16px;
+}
+
+#bingoSizeSelector button,
+#songModeSelector button,
+#centerOptionSelector .center-btn {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  background-color: #f7f7f7;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#bingoSizeSelector button,
+#centerOptionSelector .center-btn {
+  width: 100px;
+}
+
+#songModeSelector button {
+  min-width: 140px;
+}
+
+/* 選択済みボタン */
+#bingoSizeSelector button.selected,
+#songModeSelector button.selected,
+#centerOptionSelector .center-btn.selected {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+/* 中央マス選択は初期状態で無効 */
+#centerOptionSelector {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+
