@@ -1,0 +1,2 @@
+# pjsekai_Cheerful_Bingo
+プロセカの楽曲ビンゴ作成ツール
