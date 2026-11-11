@@ -1,0 +1,245 @@
+/* スマートフォン向けの追加スタイル。既存CSSの後に読み込む */
+@media (max-width: 600px) {
+  *, *::before, *::after { 
+    box-sizing: border-box; 
+  }
+
+  html { 
+    -webkit-text-size-adjust: 100%; 
+  }
+
+  body { 
+    margin: 0; 
+    font-size: 16px; 
+    line-height: 1.55; 
+    overflow-x: hidden; 
+  }
+  
+  #main { 
+    width: 100%; 
+    max-width: 100%; 
+    padding: 14px 12px 32px; 
+  }
+
+  #main > .title { 
+    font-size: clamp(22px, 6vw, 28px); 
+    line-height: 1.3; 
+    margin: 10px 0 14px; 
+  }
+
+  #main h1:not(.title) { 
+    font-size: clamp(19px, 5vw, 23px); 
+    line-height: 1.4; 
+    margin: 24px 0 14px; 
+  }
+
+  #step1, #songModeStep, #step2, #centerSongSelector, #songSelectStep, #randomGenerateStep { 
+    scroll-margin-top: 14px; 
+  }
+
+  #bingoSizeSelector, #songModeSelector, #centerOptionSelector { 
+    display: flex; 
+    width: 100%; 
+    gap: 8px; 
+    margin: 0 0 18px; 
+  }
+
+  #bingoSizeSelector button, #songModeSelector button, #centerOptionSelector .center-btn {
+    flex: 1 1 0; 
+    min-width: 0; 
+    width: auto; 
+    min-height: 52px; 
+    margin: 0;
+    padding: 10px 5px; 
+    font-size: 15px; 
+    font-weight: 600; 
+    touch-action: manipulation;
+  }
+
+  #centerSearchInput, #centerUnitSelect, #centerMvTypeSelect, #centerSongTypeSelect,
+  #searchInput, #unitSelect, #mvTypeSelect, #songTypeSelect {
+    display: block; 
+    width: 100%; 
+    max-width: 100%; 
+    min-height: 48px;
+    margin: 0 0 10px; 
+    padding: 10px 12px; 
+    font-size: 16px;
+    border: 1px solid #aaa; 
+    border-radius: 8px; 
+    background: #fff;
+  }
+
+  #centerSongListContainer, #songListContainer {
+    width: 100%; 
+    max-width: 100%; 
+    max-height: min(55vh, 440px);
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #centerSongList, #songList { 
+    width: 100%; 
+    table-layout: fixed; 
+    font-size: 14px; 
+  }
+
+  #centerSongList th, #centerSongList td, #songList th, #songList td {
+    padding: 10px 6px; 
+    overflow-wrap: anywhere; 
+    word-break: normal;
+  }
+
+  /* 3列のまま、曲名をできるだけ広くする */
+  #centerSongList th:nth-child(1), #centerSongList td:nth-child(1),
+  #songList th:nth-child(1), #songList td:nth-child(1) { 
+    width: 88px; 
+  }
+
+  #centerSongList th:nth-child(2), #centerSongList td:nth-child(2),
+  #songList th:nth-child(2), #songList td:nth-child(2) { 
+    width: 49%; 
+  }
+
+  #centerSongList th:nth-child(3), #centerSongList td:nth-child(3),
+  #songList th:nth-child(3), #songList td:nth-child(3) { 
+    width: auto; 
+    font-size: 12px; 
+  }
+
+  #centerSongList tbody tr, #songList tbody tr { 
+    height: 58px; 
+    touch-action: manipulation; 
+  }
+
+  #centerSongList tbody td, #songList tbody td { 
+    height: 58px; 
+    vertical-align: middle; 
+  }
+
+  #centerSongList input[type="checkbox"], #songList tbody input[type="checkbox"] {
+    width: 20px; 
+    height: 20px; 
+    transform: none; 
+    margin: 0; 
+    accent-color: #358d46;
+  }
+
+  #songList .header-title { 
+    height: 34px; 
+    padding: 0 5px; 
+    font-size: 13px; 
+  }
+
+  #songList .header-controls { 
+    height: auto; 
+    min-height: 62px; 
+    padding: 4px 5px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 3px; 
+  }
+
+  #songList .header-controls-empty { 
+    height: 62px; 
+  }
+
+  #songList .header-controls label { 
+    font-size: 11px; 
+    gap: 5px; 
+    line-height: 1.4;
+    white-space: nowrap; 
+  }
+
+  #songList .header-controls input[type="checkbox"] { 
+    width: 16px; 
+    height: 16px; 
+    transform: none; 
+    margin: 0; 
+  }
+
+  .selected-songs-details { 
+    width: 100%; 
+    max-width: 100%;
+  }
+
+  .selected-songs-summary { 
+    min-height: 48px; 
+    font-size: 15px; 
+  }
+
+  #selectedSongs { 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+  }
+
+  #selectedSongs li { 
+    font-size: 13px;
+  }
+
+  #generateBingoBtn, #randomGenerateBtn, #saveBingoBtn {
+    display: block; 
+    width: 100%; 
+    max-width: 100%; 
+    min-height: 54px;
+    padding: 13px 12px; 
+    margin: 18px auto; 
+    font-size: 18px;
+    touch-action: manipulation;
+  }
+
+  #bingoContainer, .bingo-wrapper { 
+    width: 100%; 
+    max-width: 100%; 
+  }
+
+  .bingo-wrapper { 
+    aspect-ratio: 1 / 1; 
+  }
+
+  .bingo-table td.text-padding { 
+    padding: 2px; 
+  }
+
+  #savedBingoSection {
+    width: 100%; 
+    max-width: 100%; 
+    padding: 8px 0; 
+  }
+
+  .saved-bingo-row { 
+    gap: 8px; 
+  }
+
+  .saved-bingo-row button, #deleteAllBingosBtn { 
+    min-height: 44px; 
+    padding: 9px 12px; 
+    font-size: 14px; 
+  }
+
+  .saved-bingo-toolbar { 
+    align-items: stretch; 
+  }
+}
+
+@media (max-width: 360px) {
+  #main { 
+    padding-left: 8px; 
+    padding-right: 8px; 
+  }
+
+  #centerSongList th:nth-child(1), #centerSongList td:nth-child(1),
+  #songList th:nth-child(1), #songList td:nth-child(1) { 
+    width: 76px; 
+  }
+
+  #centerSongList th:nth-child(3), #centerSongList td:nth-child(3),
+  #songList th:nth-child(3), #songList td:nth-child(3) { 
+    font-size: 11px; 
+  }
+
+  #bingoSizeSelector button, #songModeSelector button, #centerOptionSelector .center-btn { 
+    font-size: 13px; 
+  }
+}
