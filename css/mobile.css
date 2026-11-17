@@ -146,19 +146,21 @@
     height: 62px; 
   }
 
-  #songList .header-controls label { 
-    font-size: 11px; 
-    gap: 5px; 
-    line-height: 1.4;
-    white-space: nowrap; 
-  }
+#songList .header-controls label {
+  font-size: 13px;
+  gap: 5px;
+  line-height: 1.4;
+  white-space: nowrap;
+  min-height: 24px;
+}
 
-  #songList .header-controls input[type="checkbox"] { 
-    width: 16px; 
-    height: 16px; 
-    transform: none; 
-    margin: 0; 
-  }
+#songList .header-controls input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  transform: none;
+  margin: 0;
+  flex-shrink: 0;
+}
 
   .selected-songs-details { 
     width: 100%; 

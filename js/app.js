@@ -66,6 +66,7 @@ async function loadSongs() {
   populateSongTypeSelect();
   renderSavedBingoList();
   restoreLastBingo();
+  updateGenerateButton();
 
   // 曲データ読み込み後、全ランダム生成ボタンの状態を更新
   if (selectedSongMode === "random" && selectedSize) {
@@ -668,44 +669,109 @@ window.addEventListener("DOMContentLoaded", loadSongs);
 // ビンゴ生成ボタン
 const generateBtn = document.getElementById("generateBingoBtn");
 
-// ボタン活性化のチェック
-function updateGenerateButton() {
-  if (!selectedSize) {
-    generateBtn.disabled = true;
-    return;
-  }
-
-  const total = selectedSize * selectedSize;
-  let requiredSongs = total;
-
-  // 中央マスがFREEの場合は1曲減らす
-  if (selectedCenterOption === "FREE") {
-    requiredSongs -= 1;
-  }
-
-  generateBtn.disabled = selectedSongs.length < requiredSongs;
+// 必要曲数と生成可能な状態を確認
+function getRequiredSongCount() {
+  return selectedSize ** 2 - (selectedCenterOption === "FREE" ? 1 : 0);
 }
 
-searchInput.addEventListener("input", () => {
-  renderSongList();
-  updateGenerateButton();
-});
+function canGenerateManual() {
+  return selectedSongMode === "manual" && [3, 5, 7].includes(selectedSize) &&
+    ["FREE", "任意の曲", "ランダム"].includes(selectedCenterOption) &&
+    (selectedCenterOption !== "任意の曲" || !!centerSelectedSong);
+}
 
-unitSelect.addEventListener("change", () => {
-  renderSongList();
-  updateGenerateButton();
-});
+function updateGenerateButton() {
+  generateBtn.disabled = !canGenerateManual() || !allSongs.length;
+}
 
-// ★ ビンゴ生成ボタン押下時
-generateBtn.addEventListener("click", () => {
-  if (!confirmNewBingoGeneration()) return;
+// 選択済みの曲を除外し、IDの重複も除去
+function getRandomCandidates(songs, chosen) {
+  const ids = new Set(chosen.map(song => song.id));
+  return [...new Map(songs.filter(song => !ids.has(song.id)).map(song => [song.id, song])).values()];
+}
 
-  const bingoData = createBingo(selectedSongs, selectedSize, selectedCenterOption, centerSelectedSong);
-  saveNewBingoAndShow(bingoData, selectedSize);
+function sampleSongs(songs, count) {
+  const shuffled = [...songs];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+}
 
-  saveBingoArea.style.display = "block";
+// 不足時のみ表示するモーダル（HTML・CSSの置換は不要）
+function chooseRandomScope(missing, chosenCount, required, allCount, filteredCount) {
+  return new Promise(resolve => {
+    const dialog = document.createElement("dialog");
+    dialog.setAttribute("aria-labelledby", "partialRandomTitle");
+    dialog.style.cssText = "box-sizing:border-box;width:min(92vw,460px);max-height:85vh;overflow:auto;border:1px solid #aaa;border-radius:12px;padding:20px;color:#222;background:#fff;text-align:left;";
+    const style = document.createElement("style");
+    style.textContent = "#partialRandomDialog::backdrop{background:rgba(0,0,0,.5)} #partialRandomDialog button{min-height:44px;padding:10px 14px;border:1px solid #aaa;border-radius:6px;font-size:16px;cursor:pointer} #partialRandomDialog button:disabled{opacity:.45;cursor:default} #partialRandomDialog label{display:flex;align-items:flex-start;gap:10px;padding:12px 0;cursor:pointer} #partialRandomDialog input{width:20px;height:20px;flex-shrink:0;margin:2px 0} #partialRandomDialog p{line-height:1.5;margin:8px 0} ";
+    dialog.id = "partialRandomDialog";
+    dialog.innerHTML = `
+      <h2 id="partialRandomTitle" style="font-size:20px;margin:0 0 12px">選択曲数が不足しています</h2>
+      <p>現在の選択曲数：${chosenCount} / ${required}曲</p>
+      <p>不足している <strong>${missing}曲</strong> をランダムで補いますか？</p>
+      <fieldset style="border:1px solid #ccc;border-radius:6px;margin:16px 0;padding:8px 12px;min-width:0">
+        <legend>ランダム選曲の対象</legend>
+        <label><input type="radio" name="partialScope" value="all" ${allCount >= missing ? "checked" : "disabled"}><span><strong>すべての楽曲から選ぶ</strong><br><small>未選択の候補：${allCount}曲</small></span></label>
+        <label><input type="radio" name="partialScope" value="filtered" ${filteredCount < missing ? "disabled" : ""}><span><strong>現在の絞り込み条件から選ぶ</strong><br><small>未選択の候補：${filteredCount}曲</small></span></label>
+        ${filteredCount < missing ? `<p style="color:#b42318;font-size:13px">絞り込み条件に合う未選択の楽曲が不足しています。（${filteredCount} / ${missing}曲）</p>` : ""}
+        ${allCount < missing ? '<p style="color:#b42318">全楽曲からも必要数を確保できません。</p>' : ""}
+      </fieldset>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button type="button" data-cancel>キャンセル</button>
+        <button type="button" data-generate style="background:#4caf50;color:white;border-color:#4caf50" ${allCount < missing ? "disabled" : ""}>ビンゴを生成</button>
+      </div>`;
+    dialog.append(style);
+    document.body.append(dialog);
+    let result = null;
+    dialog.addEventListener("close", () => {
+      dialog.remove();
+      resolve(result);
+    }, { once: true });
+    dialog.querySelector("[data-cancel]").addEventListener("click", () => dialog.close());
+    dialog.querySelector("[data-generate]").addEventListener("click", () => {
+      const scope = dialog.querySelector('input[name="partialScope"]:checked');
+      if (!scope || scope.disabled) return;
+      result = scope.value;
+      dialog.close();
+    });
+    dialog.showModal();
+  });
+}
 
-  scrollToStep(bingoContainer);
+// ビンゴ生成ボタン押下時
+let manualGenerationPending = false;
+generateBtn.addEventListener("click", async () => {
+  if (!canGenerateManual() || manualGenerationPending || !allSongs.length) return;
+  manualGenerationPending = true;
+  try {
+    const size = selectedSize;
+    const centerOption = selectedCenterOption;
+    const centerSong = centerSelectedSong;
+    const required = getRequiredSongCount();
+    const chosen = [...new Map(selectedSongs.map(song => [song.id, song])).values()];
+    if (centerOption === "任意の曲" && !chosen.some(song => song.id === centerSong.id)) chosen.push(centerSong);
+    const missing = required - chosen.length;
+    let songs = chosen;
+    if (missing > 0) {
+      const allCandidates = getRandomCandidates(allSongs, chosen);
+      const filteredCandidates = getRandomCandidates(getVisibleSongs(), chosen);
+      const scope = await chooseRandomScope(missing, chosen.length, required, allCandidates.length, filteredCandidates.length);
+      if (!scope) return;
+      const candidates = scope === "all" ? allCandidates : filteredCandidates;
+      if (candidates.length < missing) return;
+      songs = [...chosen, ...sampleSongs(candidates, missing)];
+    }
+    if (!confirmNewBingoGeneration()) return;
+    const bingoData = createBingo(songs, size, centerOption, centerSong);
+    saveNewBingoAndShow(bingoData, size);
+    saveBingoArea.style.display = "block";
+    scrollToStep(bingoContainer);
+  } finally {
+    manualGenerationPending = false;
+  }
 });
 
 /*
