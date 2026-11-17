@@ -49,13 +49,17 @@
   text-align: center;
 }
 
-#bingoSizeSelector button,
-#centerOptionSelector .center-btn {
+/* ビンゴサイズ選択ボタン */
+#bingoSizeSelector button {
   width: 100px;
 }
 
-#songModeSelector button {
-  min-width: 140px;
+/* 曲の選び方・中央マス選択ボタン */
+#songModeSelector button,
+#centerOptionSelector .center-btn {
+  width: 140px;
+  height: 42px;
+  white-space: nowrap;
 }
 
 /* 選択済みボタン */
