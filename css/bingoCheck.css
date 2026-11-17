@@ -179,3 +179,13 @@
   z-index: 5;
 }
 
+
+/* iOS Safari: ホバー・長押し中もセル全面に固定 */
+.bingo-table td > .jacket-wrapper,
+.bingo-table td > .jacket-wrapper:hover,
+.bingo-table td > .jacket-wrapper.long-press {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

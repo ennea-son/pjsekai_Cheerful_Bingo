@@ -7,11 +7,6 @@ export async function exportBingoImage(selectedSize, saveBingoBtn) {
     return;
   }
 
-  if (typeof html2canvas === "undefined") {
-    alert("画像保存用ライブラリが読み込まれていません。");
-    return;
-  }
-
   saveBingoBtn.disabled = true;
   saveBingoBtn.textContent = "画像を作成中...";
 
@@ -42,19 +37,59 @@ export async function exportBingoImage(selectedSize, saveBingoBtn) {
       throw new Error(`${failedImages.length}枚のジャケット画像を読み込めませんでした。`);
     }
 
-    // ビンゴカードを画像化
-    const canvas = await html2canvas(bingo, {
-      backgroundColor: "#ffffff",
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      onclone: (clonedDocument) => {
-        const clonedBingo = clonedDocument.querySelector("#bingoContainer .bingo-wrapper");
-
-        if (clonedBingo) {
-          clonedBingo.classList.add("bingo-exporting");
+    // DOMの描画サイズに依存せず、正方形のマスに直接描画する
+    const cells = [...bingo.querySelectorAll(".bingo-table td")];
+    const size = Number(selectedSize);
+    if (![3, 5, 7].includes(size) || cells.length !== size * size) {
+      throw new Error("ビンゴカードのサイズが正しくありません。");
+    }
+    const canvas = document.createElement("canvas");
+    const cellSize = 200;
+    canvas.width = canvas.height = size * cellSize;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("画像を作成できませんでした。");
+    cells.forEach((cell, i) => {
+      const x = (i % size) * cellSize;
+      const y = Math.floor(i / size) * cellSize;
+      ctx.fillStyle = cell.classList.contains("free-cell") ? "#fff" : "#fafafa";
+      ctx.fillRect(x, y, cellSize, cellSize);
+      const img = cell.querySelector("img");
+      if (img) {
+        const ratio = Math.min(cellSize / img.naturalWidth, cellSize / img.naturalHeight);
+        const w = img.naturalWidth * ratio;
+        const h = img.naturalHeight * ratio;
+        ctx.drawImage(img, x + (cellSize - w) / 2, y + (cellSize - h) / 2, w, h);
+      } else {
+        const title = [...cell.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join("").trim();
+        ctx.fillStyle = "#222";
+        ctx.font = "bold 16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const lines = [];
+        let line = "";
+        for (const ch of title) {
+          if (line && ctx.measureText(line + ch).width > cellSize - 16) { lines.push(line); line = ""; }
+          line += ch;
         }
-      },
+        if (line) lines.push(line);
+        lines.slice(0, 9).forEach((s, j) => ctx.fillText(s, x + cellSize / 2, y + cellSize / 2 + (j - (Math.min(lines.length, 9) - 1) / 2) * 20));
+      }
+      if (cell.classList.contains("bingo-checked") && !cell.classList.contains("free-cell")) {
+        ctx.fillStyle = "rgba(22,120,70,.28)";
+        ctx.fillRect(x, y, cellSize, cellSize);
+        ctx.save();
+        ctx.fillStyle = "white";
+        ctx.shadowColor = "rgba(0,0,0,.8)";
+        ctx.shadowBlur = 6;
+        ctx.font = "900 110px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("✓", x + cellSize / 2, y + cellSize / 2);
+        ctx.restore();
+      }
+      ctx.strokeStyle = "#555";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
     });
 
     // PNG形式に変換

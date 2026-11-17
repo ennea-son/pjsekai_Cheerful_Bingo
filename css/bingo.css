@@ -265,3 +265,20 @@
     padding: 8px 10px;
   }
 }
+
+/* iOS Safari: テーブルセル内の百分率高さへの依存をなくす */
+.bingo-table td { position: relative; }
+.bingo-table td > .jacket-wrapper,
+.bingo-table td > .free-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.bingo-table .jacket-wrapper > .bingo-jacket {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
