@@ -92,25 +92,66 @@ export async function exportBingoImage(selectedSize, saveBingoBtn) {
       ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
     });
 
-    // PNG形式に変換
+    // PNG形式に変換（同期処理で共有に必要な操作権限を維持）
     const imageUrl = canvas.toDataURL("image/png");
-
-    // ダウンロード
-    const link = document.createElement("a");
-    link.href = imageUrl;
-    // 保存日時を取得
     const now = new Date();
-
     const pad = (num) => String(num).padStart(2, "0");
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const filename = `pjsekaibingo_${selectedSize}x${selectedSize}_${timestamp}.png`;
 
-    const timestamp = `${now.getFullYear()}` + `${pad(now.getMonth() + 1)}` + `${pad(now.getDate())}_` + `${pad(now.getHours())}` + `${pad(now.getMinutes())}` + `${pad(now.getSeconds())}`;
+    const download = () => {
+      const link = document.createElement("a");
+      link.href = imageUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
 
-    // ダウンロードファイル名
-    link.download = `pjsekaibingo_${selectedSize}x${selectedSize}_${timestamp}.png`;
+    // iPhone・iPad（デスクトップ表示のiPadも含む）
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    if (isIOS && navigator.share && navigator.canShare) {
+      const binary = atob(imageUrl.split(",")[1]);
+      const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+      const file = new File([bytes], filename, { type: "image/png" });
+      const shareData = { files: [file] };
+
+      if (navigator.canShare(shareData)) {
+        // 画像作成中にユーザー操作の有効期限が切れた場合は再タップ
+        const retryShare = () => new Promise((resolve, reject) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = "共有メニューを開く";
+          button.style.cssText = "display:block;margin:12px auto;padding:12px 20px;font-size:16px;";
+          saveBingoBtn.after(button);
+          button.addEventListener("click", async () => {
+            button.disabled = true;
+            try { await navigator.share(shareData); resolve(); }
+            catch (error) { reject(error); }
+            finally { button.remove(); }
+          }, { once: true });
+        });
+        try {
+          if (navigator.userActivation?.isActive === false) {
+            await retryShare();
+          } else {
+            try { await navigator.share(shareData); }
+            catch (error) {
+              if (error.name !== "NotAllowedError") throw error;
+              await retryShare();
+            }
+          }
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+          console.warn("共有できなかったためダウンロードに切り替えます", error);
+        }
+      }
+    }
+    // PC・Android・共有非対応ブラウザ
+    download();
   } catch (error) {
     console.error("ビンゴ画像の保存に失敗しました:", error);
     alert(`画像の保存に失敗しました。\n${error.message}`);
