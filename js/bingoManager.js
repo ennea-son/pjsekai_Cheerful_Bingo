@@ -32,9 +32,10 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
   const nameBar = document.createElement("div");
   nameBar.id = "bingoNameBar";
   nameBar.hidden = true;
-  nameBar.style.cssText = "margin:16px auto 10px;text-align:center;max-width:700px;";
+  nameBar.style.cssText = "display:none;margin:16px auto 10px;text-align:center;max-width:700px;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
+
   const nameTitle = document.createElement("h3");
-  nameTitle.style.cssText = "display:inline-block;margin:0 12px 8px 0;max-width:100%;overflow-wrap:anywhere;vertical-align:middle;";
+  nameTitle.style.cssText = "margin:0;max-width:100%;min-width:0;overflow-wrap:anywhere;";
   const editNameButton = document.createElement("button");
   editNameButton.type = "button";
   editNameButton.textContent = "名前を編集";
@@ -46,11 +47,13 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
     activeName = normalizeBingoName(name);
     nameTitle.textContent = activeName || "ビンゴカード";
     nameBar.hidden = false;
+    nameBar.style.display = "flex";
   }
 
   function hideName() {
     activeName = "";
     nameBar.hidden = true;
+    nameBar.style.display = "none";
   }
 
   function editName(id, currentName) {
@@ -199,7 +202,7 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
           activeBingoId = null;
           activeChecked = [];
           bingoContainer.replaceChildren();
-    hideName();
+          hideName();
           saveBingoArea.style.display = "none";
           rememberActiveCard();
         }
@@ -209,7 +212,7 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
       renameButton.type = "button";
       renameButton.textContent = "名前変更";
       renameButton.addEventListener("click", () => {
-        const latest = getSavedBingos().find(item => item.id === card.id);
+        const latest = getSavedBingos().find((item) => item.id === card.id);
         if (latest) editName(latest.id, latest.name);
       });
       row.append(title, renameButton, loadButton, deleteButton);
