@@ -1,10 +1,11 @@
 import { renderBingo } from "./bingo.js";
-import { getSavedBingos, createSavedBingo, updateSavedBingo, deleteSavedBingo, deleteAllSavedBingos, MAX_SAVED_BINGOS } from "./bingoStorage.js";
+import { getSavedBingos, createSavedBingo, updateSavedBingo, deleteSavedBingo, deleteAllSavedBingos, MAX_SAVED_BINGOS, normalizeBingoName, renameSavedBingo } from "./bingoStorage.js";
 
 /* 複数ビンゴの一覧・チェック保存・復元 */
 export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep, setSelectedSize }) {
   let activeBingoId = null;
   let activeChecked = [];
+  let activeName = "";
 
   const savedBingoSection = document.createElement("section");
   savedBingoSection.id = "savedBingoSection";
@@ -27,8 +28,49 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
 
   bingoContainer.parentNode.insertBefore(savedBingoSection, bingoContainer);
 
+  // 名前欄はビンゴ本体の外に置き、PNG描画には含めない
+  const nameBar = document.createElement("div");
+  nameBar.id = "bingoNameBar";
+  nameBar.hidden = true;
+  nameBar.style.cssText = "margin:16px auto 10px;text-align:center;max-width:700px;";
+  const nameTitle = document.createElement("h3");
+  nameTitle.style.cssText = "display:inline-block;margin:0 12px 8px 0;max-width:100%;overflow-wrap:anywhere;vertical-align:middle;";
+  const editNameButton = document.createElement("button");
+  editNameButton.type = "button";
+  editNameButton.textContent = "名前を編集";
+  editNameButton.style.cssText = "padding:8px 12px;cursor:pointer;font-size:14px;";
+  nameBar.append(nameTitle, editNameButton);
+  bingoContainer.parentNode.insertBefore(nameBar, bingoContainer);
+
+  function showName(name) {
+    activeName = normalizeBingoName(name);
+    nameTitle.textContent = activeName || "ビンゴカード";
+    nameBar.hidden = false;
+  }
+
+  function hideName() {
+    activeName = "";
+    nameBar.hidden = true;
+  }
+
+  function editName(id, currentName) {
+    const input = prompt("ビンゴの名前を入力してください（30文字まで）。\n空欄にすると初期名に戻ります。", normalizeBingoName(currentName));
+    if (input === null) return;
+    if (Array.from(input.trim()).length > 30) {
+      alert("名前は30文字以内で入力してください。");
+      return;
+    }
+    const name = normalizeBingoName(input);
+    if (id && !renameSavedBingo(id, name)) return;
+    if (id === activeBingoId) showName(name);
+    renderSavedBingoList();
+  }
+
+  editNameButton.addEventListener("click", () => editName(activeBingoId, activeName));
+
   function showSavedBingo(card) {
     activeBingoId = card.id;
+    showName(card.name);
     activeChecked = [...card.checked];
     setSelectedSize(card.size); // PNG保存時のファイル名に反映
     renderBingo(card.bingoData, card.size, activeChecked, (index, value) => {
@@ -72,6 +114,7 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
     } else {
       // 保存に失敗しても表示とチェックは利用できる
       activeBingoId = null;
+      showName("");
       activeChecked = bingoData.map((song) => song.title === "FREE");
       renderBingo(bingoData, size, activeChecked, (index, value) => {
         activeChecked[index] = value;
@@ -99,6 +142,7 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
     activeBingoId = null;
     activeChecked = [];
     bingoContainer.replaceChildren();
+    hideName();
 
     // 画像保存ボタンを非表示
     saveBingoArea.style.display = "none";
@@ -135,7 +179,8 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
       const date = new Date(card.createdAt);
       const title = document.createElement("span");
       title.className = "saved-bingo-title";
-      title.textContent = `${card.size}×${card.size}｜${Number.isNaN(date.getTime()) ? "日時不明" : date.toLocaleString("ja-JP")}｜${completed}/${card.size ** 2}マス`;
+      title.style.overflowWrap = "anywhere";
+      title.textContent = `${normalizeBingoName(card.name) || "ビンゴカード"}｜${card.size}×${card.size}｜${Number.isNaN(date.getTime()) ? "日時不明" : date.toLocaleString("ja-JP")}｜${completed}/${card.size ** 2}マス`;
       const loadButton = document.createElement("button");
       loadButton.type = "button";
       loadButton.textContent = card.id === activeBingoId ? "表示中" : "開く";
@@ -154,12 +199,20 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
           activeBingoId = null;
           activeChecked = [];
           bingoContainer.replaceChildren();
+    hideName();
           saveBingoArea.style.display = "none";
           rememberActiveCard();
         }
         renderSavedBingoList();
       });
-      row.append(title, loadButton, deleteButton);
+      const renameButton = document.createElement("button");
+      renameButton.type = "button";
+      renameButton.textContent = "名前変更";
+      renameButton.addEventListener("click", () => {
+        const latest = getSavedBingos().find(item => item.id === card.id);
+        if (latest) editName(latest.id, latest.name);
+      });
+      row.append(title, renameButton, loadButton, deleteButton);
       list.appendChild(row);
     });
   }
@@ -181,6 +234,7 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
     activeBingoId = null;
     activeChecked = [];
     bingoContainer.replaceChildren();
+    hideName();
     saveBingoArea.style.display = "none";
     rememberActiveCard();
     renderSavedBingoList();
@@ -194,5 +248,5 @@ export function createBingoManager({ bingoContainer, saveBingoArea, scrollToStep
     const card = cards.find((item) => item.id === savedActiveId) || cards[0];
     if (card) showSavedBingo(card);
   }
-  return { showSavedBingo, confirmNewBingoGeneration, saveNewBingoAndShow, renderSavedBingoList, clearActiveBingo, restoreLastBingo };
+  return { getActiveBingoName: () => activeName, showSavedBingo, confirmNewBingoGeneration, saveNewBingoAndShow, renderSavedBingoList, clearActiveBingo, restoreLastBingo };
 }

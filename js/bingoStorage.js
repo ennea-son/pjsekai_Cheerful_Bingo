@@ -39,7 +39,7 @@ export function createSavedBingo(bingoData, size) {
   const cards = getSavedBingos();
   const id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const checked = bingoData.map((song) => song.title === "FREE");
-  const card = { id, size, bingoData, checked, createdAt: new Date().toISOString() };
+  const card = { id, size, bingoData, checked, name: "", createdAt: new Date().toISOString() };
 
   // 新しいカードを先頭に置き、古いカードから上限超過分を削除
   const nextCards = [card, ...cards].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, MAX_SAVED_BINGOS);
@@ -63,4 +63,17 @@ export function deleteSavedBingo(id) {
 /* 保存済みビンゴをすべて削除 */
 export function deleteAllSavedBingos() {
   return writeCards([]);
+}
+
+// 旧カードに名前がない場合も空文字として扱う
+export function normalizeBingoName(name) {
+  return typeof name === "string" ? Array.from(name.trim()).slice(0, 30).join("") : "";
+}
+
+export function renameSavedBingo(id, name) {
+  const cards = getSavedBingos();
+  const card = cards.find(item => item.id === id);
+  if (!card) return false;
+  card.name = normalizeBingoName(name);
+  return writeCards(cards);
 }

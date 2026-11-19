@@ -1,5 +1,11 @@
 /* PNG画像として保存 */
-export async function exportBingoImage(selectedSize, saveBingoBtn) {
+export function safeBingoFilenameName(name) {
+  return Array.from(String(name ?? "").trim()).slice(0, 30).join("")
+    .replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, "_")
+    .replace(/[. ]+$/g, "");
+}
+
+export async function exportBingoImage(selectedSize, saveBingoBtn, bingoName = "") {
   const bingo = document.querySelector("#bingoContainer .bingo-wrapper");
 
   if (!bingo) {
@@ -97,7 +103,8 @@ export async function exportBingoImage(selectedSize, saveBingoBtn) {
     const now = new Date();
     const pad = (num) => String(num).padStart(2, "0");
     const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    const filename = `pjsekaibingo_${selectedSize}x${selectedSize}_${timestamp}.png`;
+    const safeName = safeBingoFilenameName(bingoName);
+    const filename = `pjsekaibingo_${safeName ? safeName + "_" : ""}${selectedSize}x${selectedSize}_${timestamp}.png`;
 
     const download = () => {
       const link = document.createElement("a");

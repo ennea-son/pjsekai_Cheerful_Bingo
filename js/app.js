@@ -825,7 +825,7 @@ randomGenerateBtn.addEventListener("click", () => {
 /* ========================================
    複数ビンゴの保存・復元・削除
 ======================================== */
-const { confirmNewBingoGeneration, saveNewBingoAndShow, renderSavedBingoList, clearActiveBingo, restoreLastBingo } = createBingoManager({
+const { getActiveBingoName, confirmNewBingoGeneration, saveNewBingoAndShow, renderSavedBingoList, clearActiveBingo, restoreLastBingo } = createBingoManager({
   bingoContainer,
   saveBingoArea,
   scrollToStep,
@@ -834,7 +834,7 @@ const { confirmNewBingoGeneration, saveNewBingoAndShow, renderSavedBingoList, cl
   },
 });
 
-saveBingoBtn.addEventListener("click", () => exportBingoImage(selectedSize, saveBingoBtn));
+saveBingoBtn.addEventListener("click", () => exportBingoImage(selectedSize, saveBingoBtn, getActiveBingoName()));
 
 /* music.json 読み込み
 document.addEventListener("DOMContentLoaded", async () => {
